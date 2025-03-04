@@ -12,7 +12,7 @@ class DataPasienController extends Controller
 
     public function index()
     {
-        $title = 'Delete Data Pasien!';
+        $title = 'Hapus data pasien!';
         $text = "Are you sure you want to delete?";
         confirmDelete($title, $text);
 
@@ -58,15 +58,15 @@ class DataPasienController extends Controller
 
         // Prepare data for DataTable
         $data = [];
-        
+        $counter =1;
         foreach ($records as $record) {
             // Ensure we safely access dataRS relation
-            $nama_rs = $record->dataRS ? ucwords($record->dataRS->nama) : '';  // Check if dataRS exists
+            $nama_rs = $record->dataRS ? ucwords($record->dataRS->nama) : '';  
 
             $data[] = [
-                'id' => $record->id,
-                'nama_rs' => $nama_rs,   // 'nama_rs' matches DataTable column definition
-                'nama_pasien' => $record->nama,  // 'nama_pasien' matches DataTable column definition
+                'id' => $counter++,
+                'nama_rs' => $nama_rs,   
+                'nama_pasien' => $record->nama, 
                 'alamat' => $record->alamat,
                 'no_telp' => $record->no_telp,
                 'action' => '
@@ -74,15 +74,11 @@ class DataPasienController extends Controller
                                 <a href="' . route("data-pasien.edit", ["id" => $record->id]) . '" class="text-primary btn-update">
                                     <button type="button" class="btn btn-outline-success btn-xs me-4">Update</button> 
                                 </a>
-                                <form action="' . route('data-pasien.destroy', ["id" => $record->id]) . '" method="POST" style="display:inline;">
-                                    ' . method_field('DELETE') . '
-                                    ' . csrf_field() . '
-                                    <button type="submit" class="btn btn-outline-danger btn-xs">Delete</button>
-                                </form>
+                                <a href="'.route('data-pasien.destroy', $record->id).'" class="btn btn-outline-danger btn-xs rounded-2" style="width:80px; margin-right:20px; display:inline;" data-confirm-delete="true">Delete</a>
                             </div>'
             ];
         }
-        // Return the response as JSON for DataTable
+      
         return response()->json([
             'draw' => intval($draw),
             'iTotalRecords' => $totalRecords,
@@ -119,7 +115,7 @@ class DataPasienController extends Controller
         $dataPasien->save();
 
         // pesan sukses
-        Alert::success('Success', 'Data Pasien Berhasil Ditambahkan!');
+        Alert::success('Success', 'Data pasien berhasil ditambahkan!');
         return redirect()->route('data-pasien.index');
     }
 
@@ -155,7 +151,7 @@ class DataPasienController extends Controller
         $dataPasien->save();
 
         // pesan sukses
-        Alert::success('Success', 'Data Pasien Berhasil Diperbarui!');
+        Alert::success('Success', 'Data pasien berhasil diperbaruhi!');
         return redirect()->route('data-pasien.index'); 
     }
 
@@ -168,7 +164,7 @@ class DataPasienController extends Controller
         $dataPasien->delete();
 
         // pesan sukses
-        Alert::success('Success', 'Data Pasien Berhasil Dihapus!');
+        Alert::success('Success', 'Data pasien berhasil dihapus!');
         return redirect()->route('data-pasien.index'); 
     }
 

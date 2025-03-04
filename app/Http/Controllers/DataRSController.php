@@ -12,7 +12,7 @@ class DataRSController extends Controller
 
     public function index()
     {
-        $title = 'Delete Data RS!';
+        $title = 'Hapus data rumah sakit!';
         $text = "Are you sure you want to delete?";
         confirmDelete($title, $text);
 
@@ -51,9 +51,10 @@ class DataRSController extends Controller
 
         // data untuk datatable
         $data = [];
+        $counter = 1;
         foreach ($records as $record) {
             $data[] = [
-                'id' => $record->id,
+                'id' => $counter++,
                 'nama' => $record->nama,
                 'alamat' => $record->alamat,
                 'email' => $record->email,
@@ -63,11 +64,7 @@ class DataRSController extends Controller
                                 <a href="'.route("data-rs.edit", ["id" => $record->id]).'" class="text-primary btn-update">
                                     <button type="button" class="btn btn-outline-success btn-xs me-4">Update</button> 
                                 </a>
-                                <form action="'.route('data-rs.destroy', ["id" => $record->id]).'" method="POST" style="display:inline;">
-                                    '.method_field('DELETE').'
-                                    '.csrf_field().'
-                                    <button type="submit" class="btn btn-outline-danger btn-xs">Delete</button>
-                                </form>
+                                <a href="'.route('data-rs.destroy', $record->id).'" class="btn btn-outline-danger btn-xs rounded-2" style="width:80px; margin-right:20px; display:inline;" data-confirm-delete="true">Delete</a>
                             </div>'
 
 
@@ -102,7 +99,8 @@ class DataRSController extends Controller
         DataRS::create($validated);
 
         // pesan sukses
-        return redirect()->route('data-rs.index')->with('success', 'Data berhasil disimpan');
+        Alert::success('Success', 'Data berhasil disimpan!');
+        return redirect()->route('data-rs.index');
     }
 
 
@@ -131,10 +129,10 @@ class DataRSController extends Controller
         
         // kondisi berhasil atau tidak
         if ($data) {
-            Alert::success('Success', 'Berhasil ubah data!');
+            Alert::success('Success', 'Berhasil memperbaruhi data rumah sakit!');
             return redirect()->route('data-rs.index');
         } else {
-            Alert::error('Error', 'Gagal ubah data!');
+            Alert::error('Error', 'Gagal memperbaruhi data rumah sakit!');
             return redirect()->back();
         }
     }
@@ -142,15 +140,24 @@ class DataRSController extends Controller
 
     public function destroy($id)
     {
+        // cari berdasarkan id
         $data = DataRS::findOrFail($id);
-        $relatedTransactions = $data->transactions()->exists();
-        if ($relatedTransactions) {
+        
+        // Mengecek apakah ada pasien terkait dengan rumah sakit 
+        $relatedDatas = $data->dataPasien()->exists();
+        
+        // Jika ada pasien terkait, tampilkan error dan jangan lanjutkan penghapusan
+        if ($relatedDatas) {
             Alert::error('Error', 'Tidak dapat menghapus data rumah sakit, karena masih ada pasien!');
             return redirect()->back();
         }
+
+        // Jika tidak ada pasien terkait, lanjutkan penghapusan data rumah sakit
         $data->delete();
 
+        // Tampilkan pesan sukses setelah penghapusan berhasil
         Alert::success('Success', 'Berhasil hapus data!');
         return redirect()->back();
     }
+
 }

@@ -17,4 +17,11 @@ class DataRS extends Model
         'email',
         'no_telp'
     ];
+
+
+    public function dataPasien()
+    {
+        // Menyatakan bahwa satu rumah sakit (DataRS) dapat memiliki banyak pasien (DataPasien)
+        return $this->hasMany(DataPasien::class, 'rs_id', 'id');
+    }
 }

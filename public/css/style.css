@@ -2,6 +2,7 @@
   white-space: nowrap; /* Mencegah teks ter-wrap di dalam tabel */
 }
 
+
  :root {
     --bs-blue: #0d6efd;
     --bs-indigo: #6610f2;
